@@ -54,7 +54,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain title='Agendamentos' items={mainNavItems} />
+                <NavMain title='Plataforma' items={mainNavItems} />
             </SidebarContent>
 
             <SidebarFooter>
