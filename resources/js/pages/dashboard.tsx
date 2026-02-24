@@ -12,7 +12,7 @@ import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: dashboard().url },
+    { title: 'Agendamentos', href: dashboard().url },
 ];
 
 // ---------------------------------------------------------------------------
@@ -65,7 +65,7 @@ export default function Dashboard() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Dashboard" />
+            <Head title="Agendamentos" />
 
             <div className="flex h-full gap-5 overflow-hidden p-4">
                 {/* ── Painel esquerdo ───────────────────────────────────── */}
