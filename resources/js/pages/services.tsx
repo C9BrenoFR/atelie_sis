@@ -1,6 +1,6 @@
 import { router } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight, Loader2, Pencil, Plus, Scissors, Trash2, TriangleAlert } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clipboard, Loader2, Pencil, Plus, Trash2, TriangleAlert } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -294,7 +294,7 @@ export default function Services({ services: allServices }: ServicesProps) {
                 {/* Cabeçalho */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <Scissors className="h-5 w-5 text-muted-foreground" />
+                        <Clipboard className="h-5 w-5 text-muted-foreground" />
                         <h1 className="text-lg font-semibold">Serviços</h1>
                         <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                             {allServices.length}
