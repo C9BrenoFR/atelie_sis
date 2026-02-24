@@ -1,6 +1,8 @@
 import { usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
+import "@radix-ui/themes/styles.css";
+
 
 type Props = {
     children: ReactNode;
