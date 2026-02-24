@@ -75,10 +75,10 @@ function parseDurationMins(duration: string): number {
 // Componente
 // ---------------------------------------------------------------------------
 export function CreateAppointmentModal({ open, defaultDate, onClose, onCreated }: Props) {
-    const { clients, services, users } = usePage().props as unknown as {
-        clients: SelectOption[];
-        services: ServiceOption[];
-        users: SelectOption[];
+    const { clientOptions: clients, serviceOptions: services, userOptions: users } = usePage().props as unknown as {
+        clientOptions: SelectOption[];
+        serviceOptions: ServiceOption[];
+        userOptions: SelectOption[];
     };
 
     const [form, setForm] = useState<FormState>({
