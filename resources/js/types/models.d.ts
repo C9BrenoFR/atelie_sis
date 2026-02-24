@@ -13,3 +13,27 @@ export type Service = {
     duration: string // "HH:MM:SS"
     value: number
 }
+
+export type PaymentHistory = {
+    id: number
+    payment_id: number
+    title: string
+    description: string | null
+    value: number
+    is_enter: boolean
+    method: string | null
+    created_at: string
+}
+
+export type Payment = {
+    id: number
+    title: string
+    description: string | null
+    value: number
+    is_enter: boolean
+    method: string | null
+    user_id: number
+    payment_histories: PaymentHistory[]
+    created_at: string
+    updated_at: string
+}
