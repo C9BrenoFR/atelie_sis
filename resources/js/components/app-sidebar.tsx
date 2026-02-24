@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { LayoutGrid, Users } from 'lucide-react';
+import { Clipboard, LayoutGrid, Users } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -25,6 +25,11 @@ const mainNavItems: NavItem[] = [
         title: 'Clientes',
         href: '/clients',
         icon: Users,
+    },
+    {
+        title: 'Serviços',
+        href: '/services',
+        icon: Clipboard,
     },
 ];
 

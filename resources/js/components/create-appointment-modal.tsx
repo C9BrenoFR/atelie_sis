@@ -14,6 +14,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { TimeInput } from '@/components/ui/time-input';
 import { Label } from '@/components/ui/label';
 import {
     Select,
@@ -213,13 +214,14 @@ export function CreateAppointmentModal({ open, defaultDate, onClose, onCreated }
                         </div>
                         <div className="grid gap-1.5">
                             <Label htmlFor="ca-time">Hora</Label>
-                            <Input
-                                id="ca-time"
-                                type="time"
-                                value={form.start_time}
-                                onChange={(e) => set('start_time', e.target.value)}
-                                aria-invalid={!!errors.start_time}
-                            />
+                            <div lang="en-GB">
+                                <TimeInput
+                                    id="ca-time"
+                                    value={form.start_time}
+                                    onChange={(v) => set('start_time', v)}
+                                    aria-invalid={!!errors.start_time}
+                                />
+                            </div>
                             {errors.start_time && (
                                 <p className="text-xs text-destructive">{errors.start_time}</p>
                             )}
