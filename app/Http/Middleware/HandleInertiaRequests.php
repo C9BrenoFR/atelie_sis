@@ -51,6 +51,9 @@ class HandleInertiaRequests extends Middleware
             'serviceOptions' => fn () => $request->user() ? Service::orderBy('title')->get(['id', 'title', 'duration', 'value']) : [],
             'userOptions'    => fn () => $request->user() ? User::orderBy('name')->get(['id', 'name']) : [],
             'paymentMethods' => ClinicConfig::paymentMethods(),
+            'flash'          => [
+                'createdUser' => fn () => $request->session()->get('createdUser'),
+            ],
         ];
     }
 }
