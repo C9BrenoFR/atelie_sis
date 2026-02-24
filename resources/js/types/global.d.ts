@@ -6,6 +6,10 @@ declare module '@inertiajs/core' {
             name: string;
             auth: Auth;
             sidebarOpen: boolean;
+            clinic: {
+                open_hour: number;
+                close_hour: number;
+            };
             [key: string]: unknown;
         };
     }
