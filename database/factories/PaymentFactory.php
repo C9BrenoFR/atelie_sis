@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,12 +23,14 @@ class PaymentFactory extends Factory
     public function definition(): array
     {
         $isEnter = fake()->boolean(80); // 80% de chance de ser entrada
+        $userIds = User::pluck('id');
 
         return [
             'title' => $isEnter ? 'Pagamento de serviço' : 'Despesa operacional',
             'description' => fake()->optional(0.6)->sentence(),
             'value' => fake()->randomFloat(2, 30, 500),
             'is_enter' => $isEnter,
+            'user_id' => $userIds->random(),
             'method' => fake()->randomElement($this->methods),
         ];
     }

@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use App\Models\Payment;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
 {
@@ -18,15 +18,15 @@ class AppointmentController extends Controller
             ->orderBy('start_time')
             ->get()
             ->map(fn ($appt) => [
-                'id'             => $appt->id,
-                'date'           => $appt->date->toDateString(),
-                'start'          => substr($appt->getRawOriginal('start_time'), 0, 5), // "HH:MM"
-                'client'         => $appt->client?->name,
-                'service'        => $appt->service?->title,
-                'duration'       => $appt->service?->getRawOriginal('duration'), // "HH:MM:SS"
-                'value'          => (float) $appt->service?->value,
-                'user'           => $appt->user?->name,
-                'paid'           => $appt->payment_id !== null,
+                'id' => $appt->id,
+                'date' => $appt->date->toDateString(),
+                'start' => substr($appt->getRawOriginal('start_time'), 0, 5), // "HH:MM"
+                'client' => $appt->client?->name,
+                'service' => $appt->service?->title,
+                'duration' => $appt->service?->getRawOriginal('duration'), // "HH:MM:SS"
+                'value' => (float) $appt->service?->value,
+                'user' => $appt->user?->name,
+                'paid' => $appt->payment_id !== null,
                 'payment_method' => $appt->payment?->method,
             ]);
 
@@ -36,11 +36,11 @@ class AppointmentController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'date'       => 'required|date',
+            'date' => 'required|date',
             'start_time' => 'required|date_format:H:i',
-            'client_id'  => 'required|exists:clients,id',
+            'client_id' => 'required|exists:clients,id',
             'service_id' => 'required|exists:services,id',
-            'user_id'    => 'required|exists:users,id',
+            'user_id' => 'required|exists:users,id',
         ]);
 
         // Verificação de conflito realizada também no servidor
@@ -63,6 +63,7 @@ class AppointmentController extends Controller
     public function destroy(Appointment $appointment): JsonResponse
     {
         $appointment->delete();
+
         return response()->json(['message' => 'Agendamento cancelado.']);
     }
 
@@ -73,18 +74,19 @@ class AppointmentController extends Controller
         }
 
         $data = $request->validate([
-            'title'       => 'required|string|max:255',
+            'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:500',
-            'value'       => 'required|numeric|min:0',
-            'method'      => 'required|string|max:50',
+            'value' => 'required|numeric|min:0',
+            'method' => 'required|string|max:50',
         ]);
 
         $payment = Payment::create([
-            'title'       => $data['title'],
+            'title' => $data['title'],
             'description' => $data['description'] ?? null,
-            'value'       => $data['value'],
-            'is_enter'    => true,
-            'method'      => $data['method'],
+            'value' => $data['value'],
+            'is_enter' => true,
+            'user_id' => auth()->id(),
+            'method' => $data['method'],
         ]);
 
         $appointment->update(['payment_id' => $payment->id]);
@@ -95,8 +97,8 @@ class AppointmentController extends Controller
     public function checkConflict(Request $request): JsonResponse
     {
         $request->validate([
-            'user_id'    => 'required|exists:users,id',
-            'date'       => 'required|date',
+            'user_id' => 'required|exists:users,id',
+            'date' => 'required|date',
             'start_time' => 'required|date_format:H:i',
             'service_id' => 'required|exists:services,id',
             'exclude_id' => 'nullable|exists:appointments,id',
@@ -124,14 +126,16 @@ class AppointmentController extends Controller
         ?int $excludeId = null,
     ): bool {
         $service = \App\Models\Service::find($serviceId);
-        if (!$service) return false;
+        if (! $service) {
+            return false;
+        }
 
         [$dh, $dm] = explode(':', $service->getRawOriginal('duration'));
-        $durationMins = (int)$dh * 60 + (int)$dm;
+        $durationMins = (int) $dh * 60 + (int) $dm;
 
         [$sh, $sm] = explode(':', $startTime);
-        $newStart = (int)$sh * 60 + (int)$sm;
-        $newEnd   = $newStart + $durationMins;
+        $newStart = (int) $sh * 60 + (int) $sm;
+        $newEnd = $newStart + $durationMins;
 
         $appointments = Appointment::with('service')
             ->where('user_id', $userId)
@@ -141,11 +145,11 @@ class AppointmentController extends Controller
 
         foreach ($appointments as $appt) {
             [$eh, $em] = explode(':', substr($appt->getRawOriginal('start_time'), 0, 5));
-            $existStart = (int)$eh * 60 + (int)$em;
+            $existStart = (int) $eh * 60 + (int) $em;
 
             $dur = $appt->service?->getRawOriginal('duration') ?? '01:00:00';
             [$edh, $edm] = explode(':', $dur);
-            $existEnd = $existStart + (int)$edh * 60 + (int)$edm;
+            $existEnd = $existStart + (int) $edh * 60 + (int) $edm;
 
             // Sobreposição: novo começa antes de existente terminar E novo termina depois de existente começar
             if ($newStart < $existEnd && $newEnd > $existStart) {
@@ -156,5 +160,3 @@ class AppointmentController extends Controller
         return false;
     }
 }
-
-

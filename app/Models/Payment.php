@@ -20,6 +20,7 @@ class Payment extends Model
         'description',
         'value',
         'is_enter',
+        'user_id',
         'method',
     ];
 

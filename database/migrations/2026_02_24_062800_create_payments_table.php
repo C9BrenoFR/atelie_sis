@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('value');
             $table->boolean('is_enter');
             $table->string('method')->nullable();
+            $table->foreignId('user_id')->constrained();
             $table->timestamps();
         });
     }
