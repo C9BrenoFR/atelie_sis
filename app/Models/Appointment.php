@@ -17,6 +17,7 @@ class Appointment extends Model
      */
     protected $fillable = [
         'date',
+        'start',
         'payment_id',
         'client_id',
         'user_id',
@@ -31,7 +32,8 @@ class Appointment extends Model
     protected function casts(): array
     {
         return [
-            'date' => 'datetime',
+            'date'  => 'date',
+            'start' => 'immutable_datetime', // cast de time para manipulação via Carbon
         ];
     }
 

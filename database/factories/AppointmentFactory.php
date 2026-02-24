@@ -21,7 +21,8 @@ class AppointmentFactory extends Factory
     public function definition(): array
     {
         return [
-            'date' => fake()->dateTimeBetween('-6 months', '+1 month'),
+            'date' => fake()->dateTimeBetween('-6 months', '+1 month')->format('Y-m-d'),
+            'start' => fake()->time('H:i:s', '18:00:00'), // horário entre 00:00 e 18:00
             'client_id' => Client::factory(),
             'user_id' => User::factory(),
             'service_id' => Service::factory(),
