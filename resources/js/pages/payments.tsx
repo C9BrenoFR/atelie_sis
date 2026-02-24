@@ -1,4 +1,4 @@
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
 import { ArrowDownCircle, ArrowUpCircle, ChevronLeft, ChevronRight, History, Loader2, Pencil, Plus, Trash2, Wallet, TriangleAlert } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -345,6 +345,8 @@ export default function Payments({ payments: allPayments }: PaymentsProps) {
     const [historyTarget, setHistoryTarget] = useState<Payment | null>(null);
     const [saving, setSaving] = useState(false);
     const [formErrors, setFormErrors] = useState<Partial<Record<keyof PaymentFormState, string>>>({});
+    const { auth } = usePage().props;
+    const user = auth.user
 
     const totalPages = Math.max(1, Math.ceil(allPayments.length / ITEMS_PER_PAGE));
     const offset = (page - 1) * ITEMS_PER_PAGE;
@@ -465,9 +467,9 @@ export default function Payments({ payments: allPayments }: PaymentsProps) {
                                     >
                                         <td className="px-4 py-3">
                                             {payment.is_enter ? (
-                                                <ArrowUpCircle className="h-4 w-4 text-green-500" title="Entrada" />
+                                                <ArrowUpCircle className="h-4 w-4 text-green-500" />
                                             ) : (
-                                                <ArrowDownCircle className="h-4 w-4 text-red-500" title="Saída" />
+                                                <ArrowDownCircle className="h-4 w-4 text-red-500" />
                                             )}
                                         </td>
                                         <td className="px-4 py-3 font-medium text-foreground">{payment.title}</td>
@@ -485,13 +487,15 @@ export default function Payments({ payments: allPayments }: PaymentsProps) {
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex items-center justify-end gap-1">
-                                                <button
-                                                    onClick={() => setHistoryTarget(payment)}
-                                                    title="Ver histórico"
-                                                    className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                                                >
-                                                    <History className="h-3.5 w-3.5" />
-                                                </button>
+                                                {user.is_admin && (
+                                                    <button
+                                                        onClick={() => setHistoryTarget(payment)}
+                                                        title="Ver histórico"
+                                                        className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                                                    >
+                                                        <History className="h-3.5 w-3.5" />
+                                                    </button>
+                                                )}
                                                 <button
                                                     onClick={() => openEdit(payment)}
                                                     title="Editar pagamento"

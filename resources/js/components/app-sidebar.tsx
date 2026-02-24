@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { Banknote, Calendar, Clipboard, LayoutGrid, Users } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -38,7 +38,23 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
+const AdminNavItems: NavItem[] = [
+    {
+        title: 'Dashboard',
+        href: '/data-analysis',
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Funcionarios',
+        href: '/users',
+        icon: Users,
+    },
+];
+
 export function AppSidebar() {
+    const { auth } = usePage().props;
+    const user = auth.user
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -54,6 +70,9 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
+                {user.is_admin && (
+                    <NavMain title='Administrativo' items={AdminNavItems} />
+                )}
                 <NavMain title='Plataforma' items={mainNavItems} />
             </SidebarContent>
 
