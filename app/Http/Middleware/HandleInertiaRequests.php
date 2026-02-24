@@ -47,9 +47,9 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen'    => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'clinic'         => ClinicConfig::toArray(),
-            'clients'        => fn () => $request->user() ? Client::orderBy('name')->get(['id', 'name']) : [],
-            'services'       => fn () => $request->user() ? Service::orderBy('title')->get(['id', 'title', 'duration', 'value']) : [],
-            'users'          => fn () => $request->user() ? User::orderBy('name')->get(['id', 'name']) : [],
+            'clientOptions'  => fn () => $request->user() ? Client::orderBy('name')->get(['id', 'name']) : [],
+            'serviceOptions' => fn () => $request->user() ? Service::orderBy('title')->get(['id', 'title', 'duration', 'value']) : [],
+            'userOptions'    => fn () => $request->user() ? User::orderBy('name')->get(['id', 'name']) : [],
             'paymentMethods' => ClinicConfig::paymentMethods(),
         ];
     }
