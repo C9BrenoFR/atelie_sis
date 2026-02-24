@@ -3,6 +3,9 @@
 namespace App\Http\Middleware;
 
 use App\Helpers\ClinicConfig;
+use App\Models\Client;
+use App\Models\Service;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -42,8 +45,12 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-            'clinic' => ClinicConfig::toArray(),
+            'sidebarOpen'    => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'clinic'         => ClinicConfig::toArray(),
+            'clients'        => fn () => $request->user() ? Client::orderBy('name')->get(['id', 'name']) : [],
+            'services'       => fn () => $request->user() ? Service::orderBy('title')->get(['id', 'title', 'duration', 'value']) : [],
+            'users'          => fn () => $request->user() ? User::orderBy('name')->get(['id', 'name']) : [],
+            'paymentMethods' => ClinicConfig::paymentMethods(),
         ];
     }
 }

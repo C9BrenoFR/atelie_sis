@@ -23,8 +23,13 @@ class ClinicConfig
     public static function toArray(): array
     {
         return [
-            'open_hour'  => self::OPEN_HOUR,
+            'open_hour' => self::OPEN_HOUR,
             'close_hour' => self::CLOSE_HOUR,
         ];
+    }
+
+    public static function paymentMethods(): array
+    {
+        return ['Pix', 'Dinheiro', 'Crédito', 'Débito'];
     }
 }
