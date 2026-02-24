@@ -5,3 +5,11 @@ export type Client = {
     gender: string
     birth_date: string
 }
+
+export type Service = {
+    id: number
+    title: string
+    description: string
+    duration: string // "HH:MM:SS"
+    value: number
+}
