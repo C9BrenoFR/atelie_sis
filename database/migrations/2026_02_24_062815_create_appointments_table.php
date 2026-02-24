@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
 
             $table->date('date');
-            $table->time('start');
+            $table->time('start_time');
 
             $table->unsignedBigInteger('payment_id')->nullable();
             $table->foreign('payment_id')->references('id')->on('payments');
