@@ -1,8 +1,9 @@
 import { Head } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { AppointmentTimeline, TimelineSkeleton } from '@/components/appointment-timeline';
+import { CreateAppointmentModal } from '@/components/create-appointment-modal';
 import { MiniCalendar } from '@/components/mini-calendar';
 import { useAppointments } from '@/hooks/use-appointments';
 import { useClinicConfig } from '@/hooks/use-clinic-config';
@@ -49,8 +50,9 @@ function formatCurrency(value: number): string {
 export default function Dashboard() {
     const today = formatLocalDate(new Date());
     const [selectedDate, setSelectedDate] = useState(today);
-    const { appointments, loading, error, fetchDay } = useAppointments();
+    const { appointments, loading, error, fetchDay, invalidate } = useAppointments();
     const { open_hour: openHour, close_hour: closeHour } = useClinicConfig();
+    const [createOpen, setCreateOpen] = useState(false);
 
     useEffect(() => {
         void fetchDay(selectedDate);
@@ -138,6 +140,14 @@ export default function Dashboard() {
                                 Hoje
                             </button>
                         )}
+
+                        <button
+                            onClick={() => setCreateOpen(true)}
+                            className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                        >
+                            <Plus className="h-4 w-4" />
+                            Agendar
+                        </button>
                     </div>
 
                     {/* Legenda */}
@@ -178,11 +188,20 @@ export default function Dashboard() {
                                 openHour={openHour}
                                 closeHour={closeHour}
                                 isToday={selectedDate === today}
+                                onDeleted={() => { invalidate(selectedDate); void fetchDay(selectedDate); }}
+                                onPaid={() => { invalidate(selectedDate); void fetchDay(selectedDate); }}
                             />
                         )}
                     </div>
                 </main>
             </div>
+
+            <CreateAppointmentModal
+                open={createOpen}
+                defaultDate={selectedDate}
+                onClose={() => setCreateOpen(false)}
+                onCreated={() => { invalidate(selectedDate); void fetchDay(selectedDate); }}
+            />
         </AppLayout>
     );
 }
