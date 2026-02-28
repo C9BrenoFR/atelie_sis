@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
-use App\Models\Client;
 use App\Models\Payment;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -25,13 +23,23 @@ class DataController extends Controller
         $startOfMonth = $date->copy()->startOfMonth();
         $endOfMonth = $date->copy()->endOfMonth();
 
-        $employee_count = User::where('is_admin', false)->count();
-        $clients_count = Client::count();
-
-        $appointments_count = Appointment::whereBetween('created_at', [
+        $appointments_count = Appointment::whereBetween('date', [
             $startOfMonth,
             $endOfMonth,
         ])->count();
+
+        $appointments_not_paid = Appointment::whereBetween('date', [
+            $startOfMonth,
+            $endOfMonth,
+        ])
+            ->whereNull('payment_id')
+            ->get();
+
+        $month_not_paid = 0;
+
+        foreach ($appointments_not_paid as $appointment) {
+            $month_not_paid += $appointment->service->value;
+        }
 
         $payments = Payment::whereBetween('created_at', [
             $startOfMonth,
@@ -39,9 +47,9 @@ class DataController extends Controller
         ])->get();
 
         return Inertia::render('data_analysis', [
-            'employees' => $employee_count,
-            'clients' => $clients_count,
-            'appointments' => $appointments_count,
+            'appointments_count' => $appointments_count,
+            'appointments_not_paid' => $appointments_not_paid->count(),
+            'month_not_paid' => $month_not_paid,
             'payments' => $payments,
             'month' => $startOfMonth->format('d/m/Y'),
         ]);

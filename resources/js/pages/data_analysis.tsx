@@ -17,6 +17,7 @@ import {
     DialogTitle,
     DialogClose,
 } from '@/components/ui/dialog';
+import DashboardCard from '@/components/ui/dashboard-card';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Agendamentos', href: dashboard().url },
@@ -24,9 +25,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface DashboardProps {
-    employees: number;
-    clients: number;
-    appointments: number;
+    appointments_count: number;
+    appointments_not_paid: number;
+    month_not_paid: number;
     payments: Payment[];
     month: string; // "dd/mm/yyyy"
 }
@@ -47,7 +48,7 @@ const CHART_COLORS = [
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
-export default function Dashboard({ employees, clients, appointments, payments, month }: DashboardProps) {
+export default function Dashboard({ appointments_count, appointments_not_paid, month_not_paid, payments, month }: DashboardProps) {
     const [monthModalOpen, setMonthModalOpen] = useState(false);
 
     // Parse "dd/mm/yyyy" -> parts
@@ -153,9 +154,18 @@ export default function Dashboard({ employees, clients, appointments, payments, 
 
                 {/* ── Stats cards (placeholders) ── */}
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border" />
-                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border" />
-                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border" />
+                    <DashboardCard
+                        value={appointments_count}
+                        label='Consultas marcadas esse mês'
+                    />
+                    <DashboardCard
+                        value={appointments_not_paid}
+                        label='Consultas não pagas desse mês'
+                    />
+                    <DashboardCard
+                        value={`R$ ${new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2, }).format(month_not_paid)}`}
+                        label='Valor a receber de consultas desse mês'
+                    />
                 </div>
 
                 {/* ── Main content ── */}
