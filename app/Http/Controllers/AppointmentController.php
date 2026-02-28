@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendAppointmentReminderJob;
 use App\Models\Appointment;
 use App\Models\Payment;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -56,6 +58,19 @@ class AppointmentController extends Controller
         }
 
         $appointment = Appointment::create($data);
+
+        $appointmentDateTime = Carbon::createFromFormat(
+            'Y-m-d H:i',
+            $data['date'].' '.$data['start_time'],
+            config('app.timezone')
+        );
+
+        $runAt = $appointmentDateTime->copy()->subDay();
+
+        if ($runAt->isFuture()) {
+            SendAppointmentReminderJob::dispatch($appointment)
+                ->delay($runAt->utc());
+        }
 
         return response()->json(['appointment' => $appointment->load(['client', 'service', 'user'])], 201);
     }
