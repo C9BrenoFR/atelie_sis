@@ -23,6 +23,7 @@ class AppointmentController extends Controller
                 'id' => $appt->id,
                 'date' => $appt->date->toDateString(),
                 'start' => substr($appt->getRawOriginal('start_time'), 0, 5), // "HH:MM"
+                'client_id' => $appt->client_id,
                 'client' => $appt->client?->name,
                 'service' => $appt->service?->title,
                 'duration' => $appt->service?->getRawOriginal('duration'), // "HH:MM:SS"

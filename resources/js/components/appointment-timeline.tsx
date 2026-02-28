@@ -1,4 +1,5 @@
-import { Banknote, Calendar, Clock, CreditCard, Trash2, User2, Wallet } from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import { Banknote, Clock, CreditCard, Trash2, User2, Wallet } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import { DeleteAppointmentModal } from '@/components/delete-appointment-modal';
@@ -11,7 +12,7 @@ import type { Appointment } from '@/types/appointment';
 // ---------------------------------------------------------------------------
 // Constante de layout — px por hora na linha do tempo
 // ---------------------------------------------------------------------------
-const ROW_HEIGHT = 80;
+const ROW_HEIGHT = 110;
 
 // ---------------------------------------------------------------------------
 // Helpers internos
@@ -212,16 +213,12 @@ export function AppointmentTimeline({
                                 <div className="flex h-full gap-2">
                                     {/* Info do agendamento */}
                                     <div className="min-w-0 flex-1">
+                                        {/* Linha 1: serviço + badge */}
                                         <div className="flex items-start gap-2">
-                                            <div className="min-w-0 flex-1">
-                                                <p className="truncate text-xs font-semibold leading-snug">
-                                                    {appt.service ?? '—'}
-                                                </p>
-                                                <p className="truncate text-[11px] text-muted-foreground">
-                                                    {appt.client ?? '—'}
-                                                </p>
-                                            </div>
-                                            {height >= 54 && (
+                                            <p className="min-w-0 flex-1 truncate text-base font-semibold leading-snug">
+                                                {appt.service ?? '—'}
+                                            </p>
+                                            {height >= 60 && (
                                                 <Badge
                                                     variant={appt.paid ? 'default' : 'outline'}
                                                     className={cn(
@@ -235,27 +232,44 @@ export function AppointmentTimeline({
                                             )}
                                         </div>
 
-                                        {height >= 68 && (
-                                            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[10px] text-muted-foreground">
-                                                <span className="flex items-center gap-1">
-                                                    <Clock className="h-2.5 w-2.5" />
+                                        {/* Linha 2: nome do cliente (clicável) */}
+                                        {appt.client_id ? (
+                                            <Link
+                                                href={`/clients/${appt.client_id}`}
+                                                className="block truncate text-sm font-semibold text-primary hover:underline"
+                                            >
+                                                {appt.client ?? '—'}
+                                            </Link>
+                                        ) : (
+                                            <p className="truncate text-sm font-semibold">{appt.client ?? '—'}</p>
+                                        )}
+
+                                        {/* Linha 3: duração + valor */}
+                                        {height >= 78 && (
+                                            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5">
+                                                <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                                                    <Clock className="h-3 w-3" />
                                                     {appt.duration ? formatDuration(appt.duration) : '—'}
                                                 </span>
-                                                <span className="flex items-center gap-1">
-                                                    <User2 className="h-2.5 w-2.5" />
-                                                    {appt.user ?? '—'}
-                                                </span>
-                                                <span className="flex items-center gap-1">
-                                                    <Banknote className="h-2.5 w-2.5" />
+                                                <span className="flex items-center gap-1 text-xs font-semibold text-foreground">
+                                                    <Banknote className="h-3 w-3" />
                                                     {appt.value != null ? formatCurrency(appt.value) : '—'}
                                                 </span>
                                                 {appt.paid && appt.payment_method && (
-                                                    <span className="flex items-center gap-1">
+                                                    <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
                                                         <CreditCard className="h-2.5 w-2.5" />
                                                         {METHODS_PT[appt.payment_method] ?? appt.payment_method}
                                                     </span>
                                                 )}
                                             </div>
+                                        )}
+
+                                        {/* Linha 4: profissional responsável */}
+                                        {height >= 96 && appt.user && (
+                                            <p className="mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground">
+                                                <User2 className="h-2.5 w-2.5" />
+                                                {appt.user}
+                                            </p>
                                         )}
                                     </div>
 
