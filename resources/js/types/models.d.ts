@@ -31,7 +31,7 @@ export type Payment = {
     description: string | null
     value: number
     is_enter: boolean
-    method: string | null
+    method: string
     user_id: number
     payment_histories: PaymentHistory[]
     created_at: string
