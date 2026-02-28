@@ -1,5 +1,5 @@
-import { Head, router } from '@inertiajs/react';
-import { ArrowLeft, Check, Pencil, X } from 'lucide-react';
+import { Head, Link, router } from '@inertiajs/react';
+import { ArrowLeft, Check, MessageCircle, Pencil, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 
 import AppLayout from '@/layouts/app-layout';
@@ -193,6 +193,16 @@ function formatPhone(phone: string): string {
     return phone;
 }
 
+function unformatPhone(phoneNumber: string): string {
+    let phone = phoneNumber.replace(/\D/g, '');
+
+    if (!phone.startsWith('55')) {
+        phone = '55' + phone;
+    }
+
+    return phone;
+}
+
 function formatDate(value: string): string {
     if (!value) return '—';
     // pega só YYYY-MM-DD caso venha como ISO
@@ -234,9 +244,15 @@ export default function ClientDetail({ client }: Props) {
                     >
                         <ArrowLeft className="h-4 w-4" />
                     </button>
-                    <div>
+                    <div className='flex gap-2 justify-center items-center'>
                         <h1 className="text-xl font-semibold">{client.name}</h1>
-                        <p className="text-sm text-muted-foreground">Clique duplo em qualquer campo para editar</p>
+                        <a
+                            target='_blank'
+                            href={`https://wa.me/${unformatPhone(client.phone)}`}
+                            className='transition-all flex h-8 w-8 items-center justify-center rounded-lg border border-border text-muted-foreground hover:bg-muted hover:scale-110 hover:text-green-500'
+                        >
+                            <MessageCircle className="h-4 w-4" />
+                        </a>
                     </div>
                 </div>
 
