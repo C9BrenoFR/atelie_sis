@@ -14,10 +14,11 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             UserSeeder::class,       // 1. Usuários (colaboradores)
-            ClientSeeder::class,     // 2. Clientes
-            ServiceSeeder::class,    // 3. Serviços
-            PaymentSeeder::class,    // 4. Pagamentos avulsos (sem agendamento)
-            AppointmentSeeder::class,// 5. Agendamentos (referenciam tudo acima)
+            ServiceSeeder::class,    // 2. Serviços
+            
+            //ClientSeeder::class,     // 3. Clientes
+            //PaymentSeeder::class,    // 4. Pagamentos avulsos (sem agendamento)
+            //AppointmentSeeder::class,// 5. Agendamentos (referenciam tudo acima)
         ]);
     }
 }

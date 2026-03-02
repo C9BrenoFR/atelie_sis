@@ -27,6 +27,6 @@ class UserSeeder extends Seeder
             'two_factor_confirmed_at' => null,
         ]);
 
-        User::factory(10)->create();
+        //User::factory(10)->create();
     }
 }
