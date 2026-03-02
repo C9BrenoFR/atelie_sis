@@ -86,7 +86,20 @@
         ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
+        ],
+        "appointment-log-all" : [
+            "grep -F \"[APPOINTMENT JOB\" storage/logs/laravel.log"
+        ],
+        "appointment-log-initiate" : [
+            "grep -F \"[APPOINTMENT JOB INITIATE]\" storage/logs/laravel.log"
+        ],
+        "appointment-log-done" : [
+            "grep -F \"[APPOINTMENT JOB DONE]\" storage/logs/laravel.log"
+        ],
+        "appointment-log-error" : [
+            "grep -F \"[APPOINTMENT JOB ERROR]\" storage/logs/laravel.log"
         ]
+
     },
     "extra": {
         "laravel": {
