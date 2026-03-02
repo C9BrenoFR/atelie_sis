@@ -38,8 +38,7 @@ class SendAppointmentReminderJob implements ShouldQueue
         4. Horário
         */
 
-        $message_template = "Olá %s tudo bem? \nPassando aqui para confirmar seu atendimento de *%s* no dia *%s* ás *%s*
-         horas. \nContamos com sua presença!";
+        $message_template = "Olá %s tudo bem? \nPassando aqui para confirmar seu atendimento de *%s* no dia *%s* ás *%s* horas. \nContamos com sua presença!";
 
         $message = sprintf(
             $message_template,
