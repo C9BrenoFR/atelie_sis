@@ -69,7 +69,7 @@ class AppointmentController extends Controller
         $runAt = $appointmentDateTime->copy()->subDay();
 
         if ($runAt->isFuture()) {
-            SendAppointmentReminderJob::dispatch($appointment)
+            SendAppointmentReminderJob::dispatch($appointment->id)
                 ->delay($runAt->utc());
         }
 
