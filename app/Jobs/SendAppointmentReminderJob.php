@@ -20,7 +20,8 @@ class SendAppointmentReminderJob implements ShouldQueue
      */
     public function handle(): void
     {
-        logger()->info('Lembrete enviado para appointment: '.$this->appointment->id);
+
+        logger()->info('[APPOINTMENT JOB DONE] Lembrete enviado para appointment: '.$this->appointment->id);
 
         /*
         -- Variaveis do template --
@@ -28,20 +29,21 @@ class SendAppointmentReminderJob implements ShouldQueue
         2. Tipo de atendimento
         3. Data (Formato dd/mm/YY)
         4. Horário
+        */
 
-        $message_template = "Olá %s tudo certo? \nPassando aqui para confirmar seu atendimento de %s no dia %s ás %s horas. \nContamos com sua presença!";
+        $message_template = "Olá %s tudo bem? \nPassando aqui para confirmar seu atendimento de *%s* no dia *%s* ás *%s*
+         horas. \nContamos com sua presença!";
 
         $message = sprintf(
             $message_template,
             $this->appointment->client->name,
             $this->appointment->service->title,
-            $this->appointment->date,
-            $this->appointment->start_time
-            );
+            $this->appointment->date->format('d/m/Y'),
+            $this->appointment->start_time->format('H:i')
+        );
 
             $phone = unformatPhoneNumber($this->appointment->client->phone);
 
             sendMessage($phone, $message);
-        */
     }
 }
