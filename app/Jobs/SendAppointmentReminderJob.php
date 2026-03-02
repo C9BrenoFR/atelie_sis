@@ -13,7 +13,7 @@ class SendAppointmentReminderJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public Appointment $appointment) {}
+    public function __construct(public int $appointment_id) {}
 
     /**
      * Execute the job.
@@ -21,7 +21,14 @@ class SendAppointmentReminderJob implements ShouldQueue
     public function handle(): void
     {
 
-        logger()->info('[APPOINTMENT JOB DONE] Lembrete enviado para appointment: '.$this->appointment->id);
+        $appointment = Appointment::find($this->appointment_id);
+
+        if(!$appointment)
+            return;
+
+        logger()->info('[APPOINTMENT JOB INITIATE]', [
+            'appointment_id' => $appointment->id,
+        ]);
 
         /*
         -- Variaveis do template --
@@ -36,14 +43,29 @@ class SendAppointmentReminderJob implements ShouldQueue
 
         $message = sprintf(
             $message_template,
-            $this->appointment->client->name,
-            $this->appointment->service->title,
-            $this->appointment->date->format('d/m/Y'),
-            $this->appointment->start_time->format('H:i')
+            $appointment->client->name,
+            $appointment->service->title,
+            $appointment->date->format('d/m/Y'),
+            $appointment->start_time->format('H:i')
         );
 
-            $phone = unformatPhoneNumber($this->appointment->client->phone);
+            $phone = unformatPhoneNumber($appointment->client->phone);
 
             sendMessage($phone, $message);
+        
+        logger()->info('[APPOINTMENT JOB DONE]', [
+            'appointment_id' => $appointment->id,
+        ]);
+    }
+
+    /**
+     * Execute when the job fail.
+     */
+    public function failed(\Throwable $exception)
+    {
+        logger()->error('[APPOINTMENT JOB ERROR]: ',[
+            'appointment_id' => $this->appointment_id,
+            'error' => $exception->getMessage(),
+        ]);
     }
 }
