@@ -64,7 +64,7 @@ export function DeleteAppointmentModal({ appointment, onClose, onDeleted }: Prop
                         </span>{' '}
                         para{' '}
                         <span className="font-semibold text-foreground">
-                            {appointment?.client ?? '—'}
+                            {appointment?.client?.name ?? '—'}
                         </span>
                         ? Esta ação não pode ser desfeita.
                     </DialogDescription>

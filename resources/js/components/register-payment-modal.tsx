@@ -33,7 +33,7 @@ interface Props {
 export function RegisterPaymentModal({ appointment, onClose, onPaid }: Props) {
     const { paymentMethods } = usePage().props as unknown as { paymentMethods: string[] };
 
-    const defaultTitle = appointment ? `${appointment.service} - ${appointment.client}` : '';
+    const defaultTitle = appointment ? `${appointment.service} - ${appointment.client?.name}` : '';
 
     const [title, setTitle] = useState(defaultTitle);
     const [description, setDescription] = useState('');
@@ -45,7 +45,7 @@ export function RegisterPaymentModal({ appointment, onClose, onPaid }: Props) {
     // Atualiza os campos padrão sempre que o agendamento mudar
     useEffect(() => {
         if (appointment) {
-            setTitle(`${appointment.service} - ${appointment.client}`);
+            setTitle(`${appointment.service} - ${appointment.client?.name}`);
             setValue(String(appointment.value ?? ''));
             setDescription('');
             setMethod('');
