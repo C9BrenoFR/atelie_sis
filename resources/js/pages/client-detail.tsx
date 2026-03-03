@@ -8,6 +8,7 @@ import { index as clientsRoute } from '@/routes/clients';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 import type { Client } from '@/types/models';
+import { unformatPhone } from '@/lib/formaters';
 
 interface Props {
     client: Client;
@@ -190,16 +191,6 @@ function formatPhone(phone: string): string {
     const d = phone.replace(/\D/g, '');
     if (d.length === 11) return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
     if (d.length === 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
-    return phone;
-}
-
-function unformatPhone(phoneNumber: string): string {
-    let phone = phoneNumber.replace(/\D/g, '');
-
-    if (!phone.startsWith('55')) {
-        phone = '55' + phone;
-    }
-
     return phone;
 }
 
