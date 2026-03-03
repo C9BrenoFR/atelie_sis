@@ -12,6 +12,13 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
@@ -55,6 +62,14 @@ const METHOD_LABELS: Record<string, string> = {
     debito: 'Débito',
     transferencia: 'Transferência',
 };
+
+const methods: string[] = [
+    'Pix',
+    'Dinheiro',
+    'Débito',
+    'Crédito',
+    'Outro'
+]
 
 // ---------------------------------------------------------------------------
 // Modal de Criar / Editar
@@ -196,17 +211,18 @@ function PaymentFormModal({
                         <Label htmlFor="pf-method">
                             Método <span className="text-muted-foreground">(opcional)</span>
                         </Label>
-                        <select
-                            id="pf-method"
-                            value={form.method}
-                            onChange={(e) => set('method', e.target.value)}
-                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                        >
-                            <option value="">Selecione...</option>
-                            {Object.entries(METHOD_LABELS).map(([k, v]) => (
-                                <option key={k} value={k}>{v}</option>
-                            ))}
-                        </select>
+                        <Select value={form.method} onValueChange={(v) => set('method', v)}>
+                            <SelectTrigger aria-invalid={!!errors.method}>
+                                <SelectValue placeholder="Selecione um método" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {methods.map((m, index) => (
+                                    <SelectItem key={index} value={m}>
+                                        {m}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                         {errors.method && <p className="text-xs text-destructive">{errors.method}</p>}
                     </div>
 
@@ -259,7 +275,7 @@ function HistoryModal({ payment, onClose }: { payment: Payment | null; onClose: 
                                             <span className="text-xs text-muted-foreground">{h.description}</span>
                                         )}
                                         <span className="text-xs text-muted-foreground">
-                                            {h.method ? METHOD_LABELS[h.method] ?? h.method : '—'}
+                                            {h.method ? h.method : '—'}
                                         </span>
                                     </div>
                                     <div className="flex flex-col items-end gap-0.5 shrink-0">
@@ -477,7 +493,7 @@ export default function Payments({ payments: allPayments }: PaymentsProps) {
                                             <span className="line-clamp-1">{payment.description || '—'}</span>
                                         </td>
                                         <td className="px-4 py-3 text-muted-foreground">
-                                            {payment.method ? (METHOD_LABELS[payment.method] ?? payment.method) : '—'}
+                                            {payment.method ?  payment.method : '—'}
                                         </td>
                                         <td className={cn(
                                             'px-4 py-3 font-medium',
