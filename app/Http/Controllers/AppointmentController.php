@@ -21,10 +21,13 @@ class AppointmentController extends Controller
             ->get()
             ->map(fn ($appt) => [
                 'id' => $appt->id,
-                'date' => $appt->date->toDateString(),
+                'date' => $appt->date->format('d/m/Y'),
                 'start' => substr($appt->getRawOriginal('start_time'), 0, 5), // "HH:MM"
-                'client_id' => $appt->client_id,
-                'client' => $appt->client?->name,
+                'client' => $appt->client ? [
+                    'id' => $appt->client->id,
+                    'name' => $appt->client->name,
+                    'phone' => $appt->client->phone,
+                ] : null,
                 'service' => $appt->service?->title,
                 'duration' => $appt->service?->getRawOriginal('duration'), // "HH:MM:SS"
                 'value' => (float) $appt->service?->value,
