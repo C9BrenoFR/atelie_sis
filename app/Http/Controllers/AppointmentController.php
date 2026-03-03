@@ -60,6 +60,9 @@ class AppointmentController extends Controller
 
         $appointment = Appointment::create($data);
 
+        /* TODO: encontrar uma api de mensagem no whatsapp por um preço bom
+        Funcionalidade 'desativada' por enquanto até
+        
         $appointmentDateTime = Carbon::createFromFormat(
             'Y-m-d H:i',
             $data['date'].' '.$data['start_time'],
@@ -72,6 +75,7 @@ class AppointmentController extends Controller
             SendAppointmentReminderJob::dispatch($appointment->id)
                 ->delay($runAt->utc());
         }
+        */
 
         return response()->json(['appointment' => $appointment->load(['client', 'service', 'user'])], 201);
     }
