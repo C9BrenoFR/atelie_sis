@@ -317,7 +317,7 @@ function DeletePaymentModal({ payment, onClose }: { payment: Payment | null; onC
         router.delete(`/payments/${payment.id}`, {
             preserveScroll: true,
             onError: () => { setError('Não foi possível excluir. Tente novamente.'); setLoading(false); },
-            onFinish: () => setLoading(false),
+            onFinish: () => { setLoading(false); onClose();},
         });
     }
 
