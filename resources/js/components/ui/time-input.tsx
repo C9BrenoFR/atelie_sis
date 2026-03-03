@@ -38,11 +38,7 @@ export function TimeInput({ id, value, onChange, className, 'aria-invalid': aria
     function handleHours(e: React.ChangeEvent<HTMLInputElement>) {
         const raw = e.target.value.replace(/\D/g, '').slice(0, 2);
         setHours(raw);
-        if (raw.length === 2 || Number(raw) > 2) {
-            emit(raw, mins);
-            minsRef.current?.focus();
-            minsRef.current?.select();
-        }
+        if (raw.length === 2) emit(raw, mins);
     }
 
     function handleMins(e: React.ChangeEvent<HTMLInputElement>) {
