@@ -1,11 +1,12 @@
 import { Link } from '@inertiajs/react';
-import { Banknote, Clock, CreditCard, Trash2, User2, Wallet } from 'lucide-react';
+import { Banknote, Clock, CreditCard, MessageCircle, Trash2, User2, Wallet } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import { DeleteAppointmentModal } from '@/components/delete-appointment-modal';
 import { RegisterPaymentModal } from '@/components/register-payment-modal';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { unformatPhone } from '@/lib/formaters';
 import { cn } from '@/lib/utils';
 import type { Appointment } from '@/types/appointment';
 
@@ -55,6 +56,11 @@ function buildHours(openHour: number, closeHour: number): number[] {
     return Array.from({ length: closeHour - openHour + 1 }, (_, i) => openHour + i);
 }
 
+function generateWhatsAppText(appt: Appointment){
+    const message = `Olá ${appt.client?.name} tudo certo?\nPassando aqui para confirmar seu atendimento de ${appt.service} no dia ${appt.date} ás ${appt.start} horas.\nContamos com sua presença!`
+    
+    return encodeURIComponent(message);
+}
 // ---------------------------------------------------------------------------
 // Skeleton — mantém a silhueta da linha do tempo durante o carregamento
 // ---------------------------------------------------------------------------
@@ -233,15 +239,15 @@ export function AppointmentTimeline({
                                         </div>
 
                                         {/* Linha 2: nome do cliente (clicável) */}
-                                        {appt.client_id ? (
+                                        {appt.client ? (
                                             <Link
-                                                href={`/clients/${appt.client_id}`}
+                                                href={`/clients/${appt.client.id}`}
                                                 className="block truncate text-sm font-semibold text-primary hover:underline"
                                             >
-                                                {appt.client ?? '—'}
+                                                {appt.client.name ?? '—'}
                                             </Link>
                                         ) : (
-                                            <p className="truncate text-sm font-semibold">{appt.client ?? '—'}</p>
+                                            <p className="truncate text-sm font-semibold">—</p>
                                         )}
 
                                         {/* Linha 3: duração + valor */}
@@ -283,6 +289,16 @@ export function AppointmentTimeline({
                                             >
                                                 <Wallet className="h-3.5 w-3.5" />
                                             </button>
+                                        )}
+                                        {appt.client?.phone && (
+                                            <a
+                                                href={`https://wa.me/${unformatPhone(appt.client.phone)}?text=${generateWhatsAppText(appt)}`}
+                                                target="_blank"
+                                                title="Mandar mensagem"
+                                                className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-emerald-100 hover:text-emerald-700 dark:hover:bg-emerald-950 dark:hover:text-emerald-400"
+                                            >
+                                                <MessageCircle className="h-3.5 w-3.5" />
+                                            </a>
                                         )}
                                         <button
                                             onClick={() => setDeleteTarget(appt)}
