@@ -254,7 +254,7 @@ function DeleteUserModal({ user, onClose }: { user: User | null; onClose: () => 
         router.delete(`/users/${user.id}`, {
             preserveScroll: true,
             onError: () => { setError('Não foi possível excluir. Tente novamente.'); setLoading(false); },
-            onFinish: () => setLoading(false),
+            onFinish: () => {setLoading(false); onClose()},
         });
     }
 
