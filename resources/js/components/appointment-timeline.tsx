@@ -19,13 +19,6 @@ const ROW_HEIGHT = 110;
 // Helpers internos
 // ---------------------------------------------------------------------------
 
-const METHODS_PT: Record<string, string> = {
-    pix: 'PIX',
-    dinheiro: 'Dinheiro',
-    cartao_credito: 'Cartão de Crédito',
-    cartao_debito: 'Cartão de Débito',
-};
-
 function parseStartMinutes(start: string): number {
     const [h, m] = start.split(':').map(Number);
     return h * 60 + m;
@@ -357,7 +350,7 @@ export function AppointmentTimeline({
                                                 {appt.paid && appt.payment_method && (
                                                     <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
                                                         <CreditCard className="h-2.5 w-2.5" />
-                                                        {METHODS_PT[appt.payment_method] ?? appt.payment_method}
+                                                        {appt.payment_method}
                                                     </span>
                                                 )}
                                             </div>
