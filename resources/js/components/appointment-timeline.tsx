@@ -56,6 +56,88 @@ function buildHours(openHour: number, closeHour: number): number[] {
     return Array.from({ length: closeHour - openHour + 1 }, (_, i) => openHour + i);
 }
 
+// ---------------------------------------------------------------------------
+// Lógica para detectar sobreposição e posicionar agendamentos lado a lado
+// ---------------------------------------------------------------------------
+
+interface AppointmentWithLayout extends Appointment {
+    column: number;
+    totalColumns: number;
+}
+
+function computeOverlapLayout(appointments: Appointment[]): AppointmentWithLayout[] {
+    if (appointments.length === 0) return [];
+
+    // Converte para estrutura com início/fim em minutos
+    const items = appointments.map((appt) => ({
+        appt,
+        start: parseStartMinutes(appt.start),
+        end: parseStartMinutes(appt.start) + parseDurationMinutes(appt.duration ?? '01:00:00'),
+    }));
+
+    // Ordena por início, depois por duração (maior primeiro)
+    items.sort((a, b) => a.start - b.start || (b.end - b.start) - (a.end - a.start));
+
+    const result: AppointmentWithLayout[] = [];
+    const groups: typeof items[] = [];
+
+    // Agrupa agendamentos que se sobrepõem
+    for (const item of items) {
+        let placed = false;
+        for (const group of groups) {
+            // Verifica se o item se sobrepõe com algum do grupo
+            const overlaps = group.some(
+                (g) => item.start < g.end && item.end > g.start
+            );
+            if (overlaps) {
+                group.push(item);
+                placed = true;
+                break;
+            }
+        }
+        if (!placed) {
+            groups.push([item]);
+        }
+    }
+
+    // Para cada grupo, atribui colunas
+    for (const group of groups) {
+        // Re-ordena o grupo por início
+        group.sort((a, b) => a.start - b.start || (b.end - b.start) - (a.end - a.start));
+
+        const columns: { end: number }[] = [];
+
+        for (const item of group) {
+            // Encontra a primeira coluna disponível
+            let col = 0;
+            while (col < columns.length && columns[col].end > item.start) {
+                col++;
+            }
+            if (col === columns.length) {
+                columns.push({ end: item.end });
+            } else {
+                columns[col].end = item.end;
+            }
+
+            result.push({
+                ...item.appt,
+                column: col,
+                totalColumns: 0, // será atualizado depois
+            });
+        }
+
+        // Atualiza totalColumns para todos do grupo
+        const totalCols = columns.length;
+        for (const r of result) {
+            if (group.some((g) => g.appt.id === r.id)) {
+                r.totalColumns = totalCols;
+            }
+        }
+    }
+
+    return result;
+}
+
 function generateWhatsAppText(appt: Appointment){
     const message = `Olá ${appt.client?.name} tudo certo?\nPassando aqui para confirmar seu atendimento de ${appt.service} no dia ${appt.date} ás ${appt.start} horas.\nContamos com sua presença!`
     
@@ -197,7 +279,7 @@ export function AppointmentTimeline({
 
                 {/* ── Cards de agendamento ─────────────────────────────────── */}
                 {appointments.length > 0 && (
-                    appointments.map((appt) => {
+                    computeOverlapLayout(appointments).map((appt) => {
                         const startMins = parseStartMinutes(appt.start);
                         const durationMins = parseDurationMinutes(appt.duration ?? '01:00:00');
 
@@ -206,14 +288,25 @@ export function AppointmentTimeline({
                         const top = ((startMins - openHour * 60) / 60) * ROW_HEIGHT;
                         const height = Math.max((durationMins / 60) * ROW_HEIGHT - 4, 40);
 
+                        // Calcula posição horizontal para agendamentos sobrepostos
+                        const leftBase = 64; // equivalente a left-16 (4rem = 64px)
+                        const rightGap = 8;  // equivalente a right-2 (0.5rem = 8px)
+                        const totalWidth = `calc(100% - ${leftBase + rightGap}px)`;
+                        const colWidth = appt.totalColumns > 1
+                            ? `calc((${totalWidth}) / ${appt.totalColumns} - 4px)`
+                            : totalWidth;
+                        const colLeft = appt.totalColumns > 1
+                            ? `calc(${leftBase}px + (((100% - ${leftBase + rightGap}px) / ${appt.totalColumns}) * ${appt.column}) + ${appt.column * 2}px)`
+                            : `${leftBase}px`;
+
                         return (
                             <div
                                 key={appt.id}
                                 className={cn(
-                                    'absolute left-16 right-2 overflow-hidden rounded-xl border border-l-4 bg-card px-3 py-2 shadow-sm transition-shadow hover:shadow-md',
+                                    'absolute overflow-hidden rounded-xl border border-l-4 bg-card px-3 py-2 shadow-sm transition-shadow hover:shadow-md',
                                     appt.paid ? 'border-l-emerald-500' : 'border-l-amber-400',
                                 )}
-                                style={{ top: top + 2, height }}
+                                style={{ top: top + 2, height, left: colLeft, width: colWidth }}
                             >
                                 {/* Conteúdo + botões lado a lado */}
                                 <div className="flex h-full gap-2">
