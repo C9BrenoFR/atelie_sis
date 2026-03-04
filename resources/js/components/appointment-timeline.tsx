@@ -139,7 +139,7 @@ function computeOverlapLayout(appointments: Appointment[]): AppointmentWithLayou
 }
 
 function generateWhatsAppText(appt: Appointment){
-    const message = `Olá ${appt.client?.name} tudo certo?\nPassando aqui para confirmar seu atendimento de ${appt.service} no dia ${appt.date} ás ${appt.start} horas.\nContamos com sua presença!`
+    const message = `Olá ${appt.client?.name.split(' ')[0]} tudo certo?\nPassando aqui para confirmar seu atendimento de ${appt.service} com a ${appt.user} no dia ${appt.date} ás ${appt.start} horas.\nContamos com sua presença!`
     
     return encodeURIComponent(message);
 }
