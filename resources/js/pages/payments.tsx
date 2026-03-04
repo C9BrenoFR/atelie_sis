@@ -55,14 +55,6 @@ function formatDate(dateStr: string): string {
     });
 }
 
-const METHOD_LABELS: Record<string, string> = {
-    pix: 'PIX',
-    dinheiro: 'Dinheiro',
-    credito: 'Crédito',
-    debito: 'Débito',
-    transferencia: 'Transferência',
-};
-
 const methods: string[] = [
     'Pix',
     'Dinheiro',

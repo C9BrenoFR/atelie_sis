@@ -1,9 +1,6 @@
-import { usePage } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-
 import { getCsrfToken } from '@/lib/csrf';
-
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -24,6 +21,13 @@ import {
 } from '@/components/ui/select';
 import type { Appointment } from '@/types/appointment';
 
+const methods: string[] = [
+    'Pix',
+    'Dinheiro',
+    'Débito',
+    'Crédito',
+    'Outro'
+]
 interface Props {
     appointment: Appointment | null;
     onClose: () => void;
@@ -31,8 +35,6 @@ interface Props {
 }
 
 export function RegisterPaymentModal({ appointment, onClose, onPaid }: Props) {
-    const { paymentMethods } = usePage().props as unknown as { paymentMethods: string[] };
-
     const defaultTitle = appointment ? `${appointment.service} - ${appointment.client?.name}` : '';
 
     const [title, setTitle] = useState(defaultTitle);
@@ -152,11 +154,11 @@ export function RegisterPaymentModal({ appointment, onClose, onPaid }: Props) {
                                     <SelectValue placeholder="Selecione" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {paymentMethods.map((m) => (
-                                        <SelectItem key={m} value={m}>
-                                            {m}
-                                        </SelectItem>
-                                    ))}
+                                    {methods.map((m, index) => (
+                                                                        <SelectItem key={index} value={m}>
+                                                                            {m}
+                                                                        </SelectItem>
+                                                                    ))}
                                 </SelectContent>
                             </Select>
                             {errors.method && (
