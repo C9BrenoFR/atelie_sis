@@ -1,6 +1,6 @@
 import { router } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight, Clipboard, Loader2, Pencil, Plus, Trash2, TriangleAlert } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clipboard, Cog, Loader2, Plus, Trash2, TriangleAlert } from 'lucide-react';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -198,7 +198,7 @@ function ServiceFormModal({
                                 <img
                                     src={previewUrl}
                                     alt="Pré-visualização da imagem do serviço"
-                                    className="h-40 w-full object-cover"
+                                    className="h-40 w-full object-contain"
                                 />
                             ) : (
                                 <div className="flex h-40 items-center justify-center text-xs text-muted-foreground">
@@ -452,7 +452,7 @@ export default function Services({ services: allServices }: ServicesProps) {
                                                     title="Editar serviço"
                                                     className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                                                 >
-                                                    <Pencil className="h-3.5 w-3.5" />
+                                                    <Cog className="h-3.5 w-3.5" />
                                                 </button>
                                                 <button
                                                     onClick={() => setDeleteTarget(service)}
