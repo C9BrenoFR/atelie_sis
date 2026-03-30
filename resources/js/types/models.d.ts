@@ -12,6 +12,7 @@ export type Service = {
     description: string
     duration: string // "HH:MM:SS"
     value: number
+    photo: string
 }
 
 export type PaymentHistory = {

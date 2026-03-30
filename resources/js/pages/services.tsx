@@ -1,7 +1,7 @@
 import { router } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
 import { ChevronLeft, ChevronRight, Clipboard, Loader2, Pencil, Plus, Trash2, TriangleAlert } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -51,6 +51,14 @@ function toInputTime(duration: string): string {
     return duration ? duration.slice(0, 5) : '';
 }
 
+function resolveServicePhoto(photo: string): string {
+    if (!photo) return '/storage/default.jpg';
+    if (photo.startsWith('http://') || photo.startsWith('https://') || photo.startsWith('/') || photo.startsWith('blob:')) {
+        return photo;
+    }
+    return `/storage/${photo}`;
+}
+
 // ---------------------------------------------------------------------------
 // Modal de Criar
 // ---------------------------------------------------------------------------
@@ -59,13 +67,23 @@ interface ServiceFormState {
     description: string;
     duration: string; // HH:MM
     value: string;
+    photo: File | null;
 }
 
-const EMPTY_FORM: ServiceFormState = { title: '', description: '', duration: '01:00', value: '' };
+interface ServiceFormErrors {
+    title?: string;
+    description?: string;
+    duration?: string;
+    value?: string;
+    photo?: string;
+}
+
+const EMPTY_FORM: ServiceFormState = { title: '', description: '', duration: '01:00', value: '', photo: null };
 
 function ServiceFormModal({
     open,
     initial,
+    initialPhotoUrl,
     onClose,
     onSubmit,
     saving,
@@ -73,17 +91,58 @@ function ServiceFormModal({
 }: {
     open: boolean;
     initial: ServiceFormState;
+    initialPhotoUrl?: string | null;
     onClose: () => void;
     onSubmit: (form: ServiceFormState) => void;
     saving: boolean;
-    errors: Partial<ServiceFormState>;
+    errors: ServiceFormErrors;
 }) {
     const [form, setForm] = useState<ServiceFormState>(initial);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(initialPhotoUrl ?? null);
+    const objectUrlRef = useRef<string | null>(null);
 
-    useEffect(() => { if (open) setForm(initial); }, [open, initial]);
+    useEffect(() => {
+        if (!open) return;
 
-    function set(field: keyof ServiceFormState, value: string) {
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current);
+            objectUrlRef.current = null;
+        }
+
+        setForm(initial);
+        setPreviewUrl(initialPhotoUrl ?? null);
+    }, [open, initial, initialPhotoUrl]);
+
+    useEffect(() => {
+        return () => {
+            if (objectUrlRef.current) {
+                URL.revokeObjectURL(objectUrlRef.current);
+            }
+        };
+    }, []);
+
+    function set(field: Exclude<keyof ServiceFormState, 'photo'>, value: string) {
         setForm((f) => ({ ...f, [field]: value }));
+    }
+
+    function handlePhotoChange(e: ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0] ?? null;
+
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current);
+            objectUrlRef.current = null;
+        }
+
+        setForm((f) => ({ ...f, photo: file }));
+
+        if (!file) {
+            setPreviewUrl(initialPhotoUrl ?? null);
+            return;
+        }
+
+        const url = URL.createObjectURL(file);
+        objectUrlRef.current = url;
+        setPreviewUrl(url);
     }
 
     const isEdit = !!initial.title;
@@ -124,6 +183,30 @@ function ServiceFormModal({
                             placeholder="Ex: Modelagem e design completo"
                         />
                         {errors.description && <p className="text-xs text-destructive">{errors.description}</p>}
+                    </div>
+
+                    <div className="grid gap-1.5">
+                        <Label htmlFor="sf-photo">Imagem</Label>
+                        <Input
+                            id="sf-photo"
+                            type="file"
+                            accept="image/*"
+                            onChange={handlePhotoChange}
+                        />
+                        <div className="overflow-hidden rounded-lg border border-border bg-muted/30">
+                            {previewUrl ? (
+                                <img
+                                    src={previewUrl}
+                                    alt="Pré-visualização da imagem do serviço"
+                                    className="h-40 w-full object-cover"
+                                />
+                            ) : (
+                                <div className="flex h-40 items-center justify-center text-xs text-muted-foreground">
+                                    Nenhuma imagem selecionada
+                                </div>
+                            )}
+                        </div>
+                        {errors.photo && <p className="text-xs text-destructive">{errors.photo}</p>}
                     </div>
 
                     {/* Duração + Valor */}
@@ -225,7 +308,7 @@ export default function Services({ services: allServices }: ServicesProps) {
     const [editTarget, setEditTarget] = useState<Service | null>(null);
     const [deleteTarget, setDeleteTarget] = useState<Service | null>(null);
     const [saving, setSaving] = useState(false);
-    const [formErrors, setFormErrors] = useState<Partial<ServiceFormState>>({});
+    const [formErrors, setFormErrors] = useState<ServiceFormErrors>({});
 
     const totalPages = Math.max(1, Math.ceil(allServices.length / ITEMS_PER_PAGE));
     const offset = (page - 1) * ITEMS_PER_PAGE;
@@ -248,20 +331,31 @@ export default function Services({ services: allServices }: ServicesProps) {
         setSaving(true);
         setFormErrors({});
 
-        const payload = { ...form, value: Number(form.value) };
+        const payload: Record<string, string | number | File> = {
+            title: form.title,
+            description: form.description,
+            duration: form.duration,
+            value: Number(form.value),
+        };
+
+        if (form.photo) {
+            payload.photo = form.photo;
+        }
 
         if (editTarget) {
             router.put(`/services/${editTarget.id}`, payload, {
+                forceFormData: true,
                 preserveScroll: true,
                 onSuccess: () => { setFormOpen(false); setSaving(false); },
-                onError: (errs) => { setFormErrors(errs as Partial<ServiceFormState>); setSaving(false); },
+                onError: (errs) => { setFormErrors(errs as ServiceFormErrors); setSaving(false); },
                 onFinish: () => setSaving(false),
             });
         } else {
             router.post('/services', payload, {
+                forceFormData: true,
                 preserveScroll: true,
                 onSuccess: () => { setFormOpen(false); setSaving(false); },
-                onError: (errs) => { setFormErrors(errs as Partial<ServiceFormState>); setSaving(false); },
+                onError: (errs) => { setFormErrors(errs as ServiceFormErrors); setSaving(false); },
                 onFinish: () => setSaving(false),
             });
         }
@@ -273,8 +367,11 @@ export default function Services({ services: allServices }: ServicesProps) {
             description: editTarget.description ?? '',
             duration: toInputTime(editTarget.duration),
             value: String(editTarget.value),
+                photo: null,
         }
         : EMPTY_FORM;
+
+            const editPhotoUrl = editTarget ? resolveServicePhoto(editTarget.photo) : null;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -283,6 +380,7 @@ export default function Services({ services: allServices }: ServicesProps) {
             <ServiceFormModal
                 open={formOpen}
                 initial={formInitial}
+                initialPhotoUrl={editPhotoUrl}
                 onClose={() => setFormOpen(false)}
                 onSubmit={handleSubmit}
                 saving={saving}
