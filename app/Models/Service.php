@@ -20,6 +20,7 @@ class Service extends Model
         'description',
         'duration',
         'value',
+        'photo',
     ];
 
     /**
